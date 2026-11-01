@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Detective de mensajes</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="cabecera">
+    <h1>Detective de mensajes</h1>
+    <p>Entrena tu propio filtro anti-spam y descubre cómo piensa (y cómo se equivoca).</p>
+  </header>
+
+  <main class="contenedor">
+
+    <!-- Aviso amable cuando falta un TODO o hay un error en tu código -->
+    <div id="caja-error" class="caja-error" hidden>
+      <strong id="error-titulo"></strong>
+      <p id="error-detalle"></p>
+      <p class="ayuda" id="error-ayuda"></p>
+    </div>
+
+    <!-- 1. Analizar un mensaje -->
+    <section class="panel">
+      <h2>1. Analiza un mensaje</h2>
+      <label for="texto">Escribe o pega un mensaje:</label>
+      <textarea id="texto" rows="3" placeholder="Ej: Felicidades, ganaste un premio, haz clic aquí"></textarea>
+      <div class="fila">
+        <button id="btn-analizar" class="boton principal">Analizar</button>
+        <span class="ayuda">Prueba con:</span>
+        <span id="ejemplos-rapidos" class="ejemplos"></span>
+      </div>
+
+      <div id="resultado" class="resultado" hidden>
+        <div class="fila veredicto-fila">
+          <span id="veredicto" class="insignia">-</span>
+          <span id="prob-texto" class="prob-texto"></span>
+        </div>
+        <div class="barra" title="Parte roja = probabilidad de spam">
+          <div id="barra-relleno" class="barra-relleno"></div>
+        </div>
+        <div class="barra-leyenda"><span>0% spam</span><span>100% spam</span></div>
+
+        <h3>Palabras que más pesaron</h3>
+        <p class="ayuda">
+          <span class="chip chip-spam">rojo</span> empuja hacia SPAM &middot;
+          <span class="chip chip-normal">verde</span> empuja hacia NORMAL.
+          El número indica cuánto empuja.
+        </p>
+        <div id="chips" class="chips"></div>
+        <p id="sin-palabras" class="ayuda" hidden>
+          El detective no conoce ninguna palabra de este mensaje, así que decide solo por la proporción de ejemplos.
+        </p>
+      </div>
+    </section>
+
+    <!-- 2. Enséñale al detective -->
+    <section class="panel">
+      <h2>2. Enséñale al detective</h2>
+      <p>¿Se equivocó? Toma el mensaje de arriba, dile qué es de verdad y mira si cambia de opinión.</p>
+      <div class="fila">
+        <button id="btn-ensenar-spam" class="boton spam">Es SPAM</button>
+        <button id="btn-ensenar-normal" class="boton normal">Es NORMAL</button>
+      </div>
+      <p id="msg-ensenar" class="ayuda" aria-live="polite"></p>
+    </section>
+
+    <!-- 3. Datos de entrenamiento -->
+    <section class="panel">
+      <h2>3. Los datos con los que aprende</h2>
+      <div class="conteos">
+        <div class="conteo">
+          <span class="conteo-numero" id="conteo-spam">0</span>
+          <span>ejemplos de spam</span>
+        </div>
+        <div class="conteo">
+          <span class="conteo-numero" id="conteo-normal">0</span>
+          <span>ejemplos normales</span>
+        </div>
+        <div class="conteo">
+          <span class="conteo-numero" id="conteo-vocab">0</span>
+          <span>palabras conocidas</span>
+        </div>
+      </div>
+      <div class="barra barra-datos" title="Proporción de ejemplos">
+        <div id="barra-datos-spam" class="barra-relleno"></div>
+      </div>
+      <div class="barra-leyenda"><span>normal</span><span>spam</span></div>
+
+      <div class="fila">
+        <button id="btn-quitar-spam" class="boton">Quitar todo el spam</button>
+        <button id="btn-quitar-normal" class="boton">Quitar todo lo normal</button>
+        <button id="btn-restaurar" class="boton">Restaurar datos originales</button>
+      </div>
+      <label class="check">
+        <input type="checkbox" id="chk-sesgado">
+        Cargar dataset sesgado (casi sin mensajes normales)
+      </label>
+    </section>
+
+    <!-- 4. Examen -->
+    <section class="panel">
+      <h2>4. Examen del detective</h2>
+      <p>Lo ponemos a prueba con mensajes que <strong>nunca vio</strong> mientras aprendía.</p>
+      <button id="btn-examen" class="boton principal">Tomar el examen</button>
+
+      <div id="examen-resultado" hidden>
+        <p class="exactitud">Exactitud: <strong id="ex-exactitud">-</strong>
+          <span class="ayuda" id="ex-detalle"></span></p>
+
+        <table class="matriz">
+          <caption>Matriz de confusión (spam = positivo)</caption>
+          <thead>
+            <tr><th></th><th>Predijo SPAM</th><th>Predijo NORMAL</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>Era SPAM</th>
+              <td class="bien"><span id="c-vp">0</span><small>vp: spam atrapado</small></td>
+              <td class="mal"><span id="c-fn">0</span><small>fn: spam que se coló</small></td>
+            </tr>
+            <tr>
+              <th>Era NORMAL</th>
+              <td class="mal"><span id="c-fp">0</span><small>fp: mensaje bueno al spam</small></td>
+              <td class="bien"><span id="c-vn">0</span><small>vn: normal bien</small></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Mensajes en los que se equivocó</h3>
+        <ul id="lista-errores" class="errores"></ul>
+        <p id="sin-errores" class="ayuda" hidden>No se equivocó en ninguno. ¿Será que el examen era demasiado fácil?</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="pie">Taller de Introducción a la IA &middot; todo corre en tu navegador, sin internet.</footer>
+
+  <!-- El orden importa: primero los datos, luego el modelo, al final la página -->
+  <script src="datos.js"></script>
+  <script src="modelo.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
