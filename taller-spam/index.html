@@ -134,12 +134,59 @@
       </div>
     </section>
 
+    <!-- 5. Comparar reglas escritas a mano contra el modelo que aprende -->
+    <section class="panel">
+      <h2>5. Comparar: reglas vs aprendido</h2>
+      <p>Las <strong>reglas</strong> las escribió una persona (<code>reglas.js</code>). El modelo <strong>aprendido</strong> sale de tus TODO (<code>modelo.js</code>). ¿Cuál lo hace mejor?</p>
+
+      <h3>Con el mensaje de arriba</h3>
+      <p id="cmp-texto-vacio" class="ayuda">Escribe un mensaje en el panel 1 y pulsa <em>Analizar</em>: aquí verás a los dos filtros lado a lado.</p>
+      <div id="cmp-texto" class="cmp-par" hidden>
+        <div class="cmp-col">
+          <h4>Reglas a mano</h4>
+          <span id="cmp-t-reglas-veredicto" class="insignia">-</span>
+          <p id="cmp-t-reglas-puntaje" class="ayuda"></p>
+          <div id="cmp-t-reglas-chips" class="chips"></div>
+        </div>
+        <div class="cmp-col">
+          <h4>Modelo aprendido</h4>
+          <span id="cmp-t-modelo-veredicto" class="insignia">-</span>
+          <p id="cmp-t-modelo-detalle" class="ayuda"></p>
+          <p id="cmp-t-modelo-aviso" class="aviso-suave" hidden></p>
+        </div>
+      </div>
+
+      <h3>Con el examen completo</h3>
+      <button id="btn-comparar" class="boton principal">Comparar en el examen</button>
+
+      <div id="cmp-examen" hidden>
+        <div class="cmp-par">
+          <div class="cmp-col">
+            <h4>Reglas a mano</h4>
+            <p class="exactitud"><strong id="cmp-reglas-exactitud">-</strong></p>
+            <p class="ayuda" id="cmp-reglas-detalle"></p>
+          </div>
+          <div class="cmp-col">
+            <h4>Modelo aprendido</h4>
+            <p class="exactitud"><strong id="cmp-modelo-exactitud">-</strong></p>
+            <p class="ayuda" id="cmp-modelo-detalle"></p>
+            <p id="cmp-modelo-aviso" class="aviso-suave" hidden></p>
+          </div>
+        </div>
+
+        <h3>Mensajes en los que NO están de acuerdo</h3>
+        <ul id="lista-desacuerdos" class="errores"></ul>
+        <p id="sin-desacuerdos" class="ayuda" hidden></p>
+      </div>
+    </section>
+
   </main>
 
   <footer class="pie">Taller de Introducción a la IA &middot; todo corre en tu navegador, sin internet.</footer>
 
   <!-- El orden importa: primero los datos, luego el modelo, al final la página -->
   <script src="datos.js"></script>
+  <script src="reglas.js"></script>
   <script src="modelo.js"></script>
   <script src="app.js"></script>
 </body>

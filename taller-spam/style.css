@@ -140,6 +140,25 @@ textarea {
 .errores li { margin-bottom: 8px; }
 .etiqueta-error { font-size: 0.85rem; color: var(--suave); display: block; }
 
+/* Comparar reglas vs aprendido */
+.cmp-par { display: flex; flex-wrap: wrap; gap: 12px; margin: 8px 0 12px; }
+.cmp-col {
+  flex: 1 1 260px;
+  background: #f8fafc;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+.cmp-col h4 { margin: 0 0 6px; }
+.aviso-suave {
+  background: #fef3c7;
+  border-left: 4px solid #f59e0b;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+}
+.desacuerdo-quien { font-size: 0.85rem; color: var(--suave); display: block; }
+
 /* Error amable */
 .caja-error {
   background: #fef3c7;

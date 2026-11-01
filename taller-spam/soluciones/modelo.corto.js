@@ -1,6 +1,6 @@
 // =====================================================================
 // TALLER: Detective de mensajes - Filtro anti-spam con Naive Bayes
-// VERSIÓN CORTA (60 min). Casi todo está hecho. Solo falta UN TODO:
+// VERSIÓN CORTA (120 min). Casi todo está hecho. Solo falta UN TODO:
 // el corazón del modelo, dentro de la función clasificar.
 //
 // Cómo usarlo: copia este archivo encima de ../modelo.js

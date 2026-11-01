@@ -5,7 +5,10 @@
 //   entrenar(datos)                 -> modelo
 //   clasificar(texto, modelo)       -> { etiqueta, probSpam, aportes }
 //   evaluar(modelo, prueba)         -> { exactitud, vp, fp, vn, fn, total, errores }
-// y los datos de datos.js: ENTRENAMIENTO y PRUEBA.
+// y la API de reglas.js (el filtro escrito a mano, sirve aunque falten TODO):
+//   puntuarPorReglas(texto)         -> { puntaje, etiqueta, coincidencias }
+//   evaluarReglas(prueba)           -> { exactitud, vp, fp, vn, fn, total, errores }
+// además de los datos de datos.js: ENTRENAMIENTO y PRUEBA.
 // =====================================================================
 
 // ---------- Estado de la página ----------
@@ -97,11 +100,15 @@ function analizar() {
   const texto = $("texto").value.trim();
   if (texto === "") {
     $("resultado").hidden = true;
+    compararTexto("");
     return;
   }
   if (!estado.modelo) {
     reentrenar();            // reintenta: quizá ya completaste el TODO
-    if (!estado.modelo) return;
+    if (!estado.modelo) {
+      compararTexto(texto);  // las reglas funcionan aunque el modelo no esté listo
+      return;
+    }
   }
   try {
     const res = clasificar(texto, estado.modelo);
@@ -112,6 +119,7 @@ function analizar() {
     $("resultado").hidden = true;
     mostrarError(error);
   }
+  compararTexto(texto);
 }
 
 function validarRespuesta(res) {
@@ -243,6 +251,172 @@ function mostrarExamen(r) {
   $("sin-errores").hidden = r.errores.length > 0;
 }
 
+// ---------- Comparar: reglas a mano vs modelo aprendido ----------
+function porcentaje(x) {
+  return (Math.round(x * 1000) / 10) + "%";
+}
+
+function reglasDisponibles() {
+  return typeof puntuarPorReglas === "function" && typeof evaluarReglas === "function";
+}
+
+// Convierte un error del modelo en una frase amable para el panel de comparar
+function avisoDeModelo(error) {
+  if (error && error.esPendiente) {
+    return "El modelo aprendido aún no está listo. " + error.message + " (las reglas sí funcionan).";
+  }
+  return "El modelo aprendido tiene un problema: " + ((error && error.message) ? error.message : String(error));
+}
+
+// El modelo no se pudo entrenar (casi siempre: falta un TODO). Es un aviso, no un fallo.
+function errorSinModelo() {
+  const error = new Error("Completa los TODO de modelo.js (mira el cuadro amarillo de arriba) y recarga la página.");
+  error.esPendiente = true;
+  return error;
+}
+
+function ponerInsignia(id, etiqueta) {
+  const el = $(id);
+  el.textContent = etiqueta === "spam" ? "SPAM" : "NORMAL";
+  el.className = "insignia " + etiqueta;
+}
+
+function quitarInsignia(id) {
+  $(id).textContent = "-";
+  $(id).className = "insignia";
+}
+
+// Pregunta al modelo aprendido por un texto. Devuelve { res } o { error }.
+function preguntarAlModelo(texto) {
+  if (!estado.modelo) {
+    return { error: errorSinModelo() };
+  }
+  try {
+    const res = clasificar(texto, estado.modelo);
+    validarRespuesta(res);
+    return { res: res };
+  } catch (error) {
+    return { error: error };
+  }
+}
+
+function compararTexto(texto) {
+  const hayTexto = texto !== "";
+  $("cmp-texto").hidden = !hayTexto;
+  $("cmp-texto-vacio").hidden = hayTexto;
+  if (!hayTexto) return;
+
+  // Lado de las reglas
+  if (!reglasDisponibles()) {
+    quitarInsignia("cmp-t-reglas-veredicto");
+    $("cmp-t-reglas-puntaje").textContent = "No se pudo cargar reglas.js.";
+    $("cmp-t-reglas-chips").textContent = "";
+  } else {
+    const r = puntuarPorReglas(texto);
+    ponerInsignia("cmp-t-reglas-veredicto", r.etiqueta);
+    $("cmp-t-reglas-puntaje").textContent = "Puntaje: " + r.puntaje +
+      " (spam si llega a " + UMBRAL_REGLAS + " o más)" +
+      (r.coincidencias.length === 0 ? ". Ninguna regla se activó." : "");
+    const chips = $("cmp-t-reglas-chips");
+    chips.textContent = "";
+    const orden = r.coincidencias.slice().sort(function (a, b) { return Math.abs(b.puntos) - Math.abs(a.puntos); });
+    for (const c of orden) {
+      const chip = document.createElement("span");
+      chip.className = "chip " + (c.puntos > 0 ? "chip-spam" : "chip-normal");
+      chip.textContent = c.palabra + " " + (c.puntos > 0 ? "+" : "") + c.puntos;
+      chips.appendChild(chip);
+    }
+  }
+
+  // Lado del modelo aprendido
+  const aviso = $("cmp-t-modelo-aviso");
+  const m = preguntarAlModelo(texto);
+  if (m.res) {
+    aviso.hidden = true;
+    ponerInsignia("cmp-t-modelo-veredicto", m.res.etiqueta);
+    $("cmp-t-modelo-detalle").textContent = "Probabilidad de spam: " + porcentaje(m.res.probSpam);
+  } else {
+    quitarInsignia("cmp-t-modelo-veredicto");
+    $("cmp-t-modelo-detalle").textContent = "";
+    aviso.hidden = false;
+    aviso.textContent = avisoDeModelo(m.error);
+  }
+}
+
+function compararExamen() {
+  if (!reglasDisponibles()) {
+    mostrarError(new Error("No se pudo cargar reglas.js (falta puntuarPorReglas o evaluarReglas)."));
+    return;
+  }
+  $("cmp-examen").hidden = false;
+
+  // Reglas: siempre disponibles
+  const rr = evaluarReglas(PRUEBA);
+  $("cmp-reglas-exactitud").textContent = porcentaje(rr.exactitud);
+  $("cmp-reglas-detalle").textContent = (rr.vp + rr.vn) + " aciertos de " + rr.total +
+    " · spam atrapado " + rr.vp + ", spam colado " + rr.fn +
+    ", normal bloqueado " + rr.fp + ", normal bien " + rr.vn;
+
+  // Modelo aprendido: puede no estar listo
+  if (!estado.modelo) reentrenar();
+  const aviso = $("cmp-modelo-aviso");
+  const filas = [];
+  let error = null;
+  let vp = 0, fp = 0, vn = 0, fn = 0;
+  if (!estado.modelo) {
+    error = errorSinModelo();
+  } else {
+    for (const ej of PRUEBA) {
+      const m = preguntarAlModelo(ej.texto);
+      if (!m.res) { error = m.error; break; }
+      filas.push({ ejemplo: ej, modelo: m.res.etiqueta, reglas: puntuarPorReglas(ej.texto).etiqueta });
+      if (ej.etiqueta === "spam" && m.res.etiqueta === "spam") vp += 1;
+      else if (ej.etiqueta === "normal" && m.res.etiqueta === "spam") fp += 1;
+      else if (ej.etiqueta === "normal") vn += 1;
+      else fn += 1;
+    }
+  }
+
+  const lista = $("lista-desacuerdos");
+  lista.textContent = "";
+  const sin = $("sin-desacuerdos");
+
+  if (error) {
+    $("cmp-modelo-exactitud").textContent = "-";
+    $("cmp-modelo-detalle").textContent = "";
+    aviso.hidden = false;
+    aviso.textContent = avisoDeModelo(error);
+    sin.hidden = false;
+    sin.textContent = "Sin el modelo aprendido no hay con quién comparar. Mientras tanto, las reglas se equivocaron en " +
+      rr.errores.length + " de " + rr.total + " mensajes.";
+    return;
+  }
+
+  aviso.hidden = true;
+  const total = PRUEBA.length;
+  $("cmp-modelo-exactitud").textContent = porcentaje(total === 0 ? 0 : (vp + vn) / total);
+  $("cmp-modelo-detalle").textContent = (vp + vn) + " aciertos de " + total +
+    " · spam atrapado " + vp + ", spam colado " + fn +
+    ", normal bloqueado " + fp + ", normal bien " + vn;
+
+  let desacuerdos = 0;
+  for (const fila of filas) {
+    if (fila.reglas === fila.modelo) continue;
+    desacuerdos += 1;
+    const li = document.createElement("li");
+    li.textContent = fila.ejemplo.texto;
+    const nota = document.createElement("span");
+    nota.className = "desacuerdo-quien";
+    const quien = fila.modelo === fila.ejemplo.etiqueta ? "acertó el modelo aprendido" : "acertaron las reglas";
+    nota.textContent = "Era " + fila.ejemplo.etiqueta + " · reglas: " + fila.reglas +
+      " · aprendido: " + fila.modelo + " → " + quien;
+    li.appendChild(nota);
+    lista.appendChild(li);
+  }
+  sin.hidden = desacuerdos > 0;
+  if (desacuerdos === 0) sin.textContent = "Los dos filtros opinan igual en todos los mensajes del examen.";
+}
+
 // ---------- Ejemplos rápidos ----------
 const EJEMPLOS_RAPIDOS = [
   "Ganaste un premio gratis, haz clic en el enlace",
@@ -285,6 +459,7 @@ function iniciar() {
     reanalizarSiHayTexto();
   });
   $("btn-examen").addEventListener("click", tomarExamen);
+  $("btn-comparar").addEventListener("click", compararExamen);
   $("texto").addEventListener("keydown", function (e) {
     if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) analizar();
   });
