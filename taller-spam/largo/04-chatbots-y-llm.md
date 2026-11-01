@@ -1,14 +1,36 @@
 # Módulo 04 · Chatbots y modelos de lenguaje (LLM)
 
-> **Curso:** Detective de mensajes ([índice del taller largo](../TALLER_LARGO.md)) · **Duración:** 60 min · **Anterior:** [Módulo 03](./03-texto-y-reglas.md) · **Siguiente:** [Módulo 05](./05-naive-bayes.md) · **Glosario:** [00-glosario.md](./00-glosario.md)
+> **Tiempo de estudio:** 60 min · **Anterior:** [Módulo 03](./03-texto-y-reglas.md) · **Siguiente:** [Módulo 05](./05-naive-bayes.md) · **Glosario:** [00-glosario.md](./00-glosario.md) · **Ayuda y consola:** [TALLER_LARGO.md](../TALLER_LARGO.md#cómo-estudiar-esto-solo)
 
-## Antes de empezar
+**Meta de este módulo:** entender cómo conversan los programas (chatbots), cómo funciona la IA de moda (los LLM) y dónde vive la IA "de verdad" (la nube). Es un módulo de **conceptos** con tres mini-programas en la consola. Todo corre **sin internet**; solo el ejercicio final (Parte 6) es opcional y necesita un asistente de chat que ya tengas. **No hace falta ninguna clave de API.**
+
+## Antes de empezar: ¿estás listo?
 
 **Recuerda del módulo anterior:** un texto se normaliza, se parte en tokens y se cuenta (bolsa de palabras). Un filtro por reglas suma puntos de un léxico y sufre con la evasión, la negación y el contexto.
 
-Si llegas sin el módulo 03, necesitas solo una idea: *un computador trabaja con números, así que el texto se convierte en piezas (tokens) que se pueden contar*. Y la consola del navegador: abre `index.html` y pulsa **F12**.
+**1. ¿Qué devuelve `tokenizar("¡Hola, Mundo!")`?**
 
-Este módulo es de **conceptos**: cómo conversan los programas y cómo funciona la IA de moda (los LLM). Todo corre **sin internet**; solo el ejercicio final es opcional y necesita un asistente de chat que ya tengas. **No hace falta ninguna clave de API.**
+<details><summary>Respuesta</summary>
+
+`['hola', 'mundo']`: minúsculas, sin signos, partido en palabras. (Pruébalo en la consola de `index.html` si dudas.)
+
+</details>
+
+**2. Nombra dos límites de un filtro por reglas.**
+
+<details><summary>Respuesta</summary>
+
+Tres posibles: la **evasión** (`g4na`), la **negación** (solo mira las dos palabras anteriores) y el **contexto** ("Ganaste el partido" sale spam).
+
+</details>
+
+**3. ¿Por qué es trampa ajustar las reglas mirando el examen?**
+
+<details><summary>Respuesta</summary>
+
+Porque el filtro ya habría "visto" las respuestas: la nota sube sin que haya aprendido algo general (fuga de datos).
+
+</details>
 
 ## Objetivos
 
@@ -16,9 +38,9 @@ Este módulo es de **conceptos**: cómo conversan los programas y cómo funciona
 - [ ] Describir las piezas de un chatbot real y las tres formas de generar respuestas.
 - [ ] Explicar a nivel de concepto cómo funciona un **LLM**: predecir la siguiente pieza de texto.
 - [ ] Ubicar los servicios de IA en la nube y por qué una clave de API es secreta.
-- [ ] (Opcional) Comparar tu propio criterio, un asistente de chat y, más adelante, tu modelo.
+- [ ] (Opcional) Evaluar con una rúbrica la respuesta de un asistente de chat sobre los 20 mensajes del examen.
 
-## Mapa de tiempos
+## Mapa de tiempos (estudio estimado)
 
 | Parte | Tema | Minutos |
 |---|---|---|
@@ -28,8 +50,10 @@ Este módulo es de **conceptos**: cómo conversan los programas y cómo funciona
 | 4 | Descanso | 5 |
 | 5 | El mapa de servicios de IA en la nube | 5 |
 | 6 | Ejercicio (opcional): 20 mensajes a un asistente | 10 |
-| 7 | Cierre | 5 |
+| 7 | Cierre: quiz y resumen | 5 |
 | | **Total** | **60** |
+
+> Abre `index.html` y deja la consola (F12) abierta: las funciones `tokenizar` y los datos `ENTRENAMIENTO` y `PRUEBA` ya existen en la página.
 
 ---
 
@@ -63,7 +87,9 @@ function detectarIntencion(texto) {
 }
 ```
 
-Y pruébalo:
+**Deberías ver:** `undefined` (solo declaraste cosas).
+
+Y pruébalo, línea por línea:
 
 ```js
 detectarIntencion("Hola")                          // "saludo"
@@ -73,7 +99,9 @@ detectarIntencion("Blablabla")                     // "desconocida"
 detectarIntencion("Hola, quiero reportar una estafa")   // "saludo": ¡se quedó con la primera!
 ```
 
-**Checkpoint · deberías ver:** `"saludo"`, `"reportar"`, `"bloqueo"`, `"desconocida"` y, en la última línea, `"saludo"` (aunque también quería reportar). Es un límite del método: una sola intención por mensaje.
+**Deberías ver:** `'saludo'`, `'reportar'`, `'bloqueo'`, `'desconocida'` y, en la última línea, `'saludo'` (aunque también quería reportar). Es un límite del método: una sola intención por mensaje, la primera de la lista que coincida.
+
+**Si no te sale…** `tokenizar is not defined` significa que no estás en la consola de `index.html` del taller (ahí `modelo.js` define `tokenizar`). Si ves `Identifier 'INTENCIONES_BOT' has already been declared`, pegaste el bloque dos veces: recarga con F5 y pégalo una vez.
 
 ### Una entidad con una regla
 
@@ -84,7 +112,23 @@ function extraerNumeros(texto) {
 extraerNumeros("Me llamaron del 3001234567 para cobrarme")   // ["3001234567"]
 ```
 
-> **Actividad 1 · Inventa dos intenciones (5 min, en parejas).** Agrega a `INTENCIONES_BOT` dos intenciones nuevas (por ejemplo "precio" o "horario") con sus palabras clave y pruébalas con `detectarIntencion`. ¿Qué mensaje se les ocurre que el bot entienda mal?
+**Deberías ver:** `(1) ['3001234567']`. `\d{7,}` significa "7 o más dígitos seguidos".
+
+> **Actividad 1 · Inventa dos intenciones (5 min).** Agrega a `INTENCIONES_BOT` dos intenciones nuevas (por ejemplo "precio" o "horario") con sus palabras clave, y pruébalas con `detectarIntencion`. Luego busca un mensaje que el bot **entienda mal**. Pista para agregar una: `INTENCIONES_BOT.push({ nombre: "horario", claves: ["horario", "hora", "abren"] });`
+
+<details><summary>Respuesta</summary>
+
+Con la intención "horario" del ejemplo:
+
+```js
+detectarIntencion("¿A qué hora abren?")                 // 'horario'
+detectarIntencion("Quiero el horario y reportar un spam") // 'reportar'  (¡la lista manda!)
+detectarIntencion("No quiero reportar nada")             // 'reportar'  (ignora el "no")
+```
+
+Mensajes que se entienden mal: los que tienen **dos intenciones** (gana la primera de la lista, no la más importante) y los que **niegan** (el bot no ve el "no"). Es el mismo problema de la negación del módulo 03.
+
+</details>
 
 ---
 
@@ -165,11 +209,18 @@ function siguientesPalabras(palabra) {
   }
   return Object.entries(cuentas).sort((a, b) => b[1] - a[1]).slice(0, 4);
 }
-siguientesPalabras("gana")
-siguientesPalabras("tu")
 ```
 
-**Checkpoint · deberías ver:** para `"gana"`, `[["dinero", 3], ["3000", 1]]`; para `"tu"`, primero `["premio", 4]` y luego `["cuenta", 3]`. Tu predictor "sabe" que después de *gana* suele venir *dinero*, **solo porque lo contó**.
+Pega eso (verás `undefined`) y luego ejecuta **una por una**:
+
+```js
+JSON.stringify(siguientesPalabras("gana"))
+JSON.stringify(siguientesPalabras("tu"))
+```
+
+**Deberías ver:** `'[["dinero",3],["3000",1]]'` para `"gana"`, y `'[["premio",4],["cuenta",3],["casa",2],["paquete",2]]'` para `"tu"`. Tu predictor "sabe" que después de *gana* suele venir *dinero*, **solo porque lo contó**.
+
+**Si no te sale…** `ENTRENAMIENTO is not defined` significa que no estás en `index.html` del taller. Si las listas salen en otro orden con el mismo número, puede ser un empate: lo importante son los conteos (`dinero` 3, `premio` 4).
 
 Un LLM real hace lo mismo, pero con **miles de millones de pesos**, mirando mucho más contexto que una sola palabra y entrenado con una enorme cantidad de texto. De ahí salen sus virtudes y sus defectos.
 
@@ -248,17 +299,25 @@ Para usar un servicio de pago necesitas una **clave de API**, que es como una co
 
 ## Parte 6 · Ejercicio (opcional): 20 mensajes a un asistente (10 min)
 
-Si tienes a mano **cualquier asistente de chat gratuito** (el que ya uses), puedes ver cómo clasifica un LLM los mismos 20 mensajes del examen de tu detective. Si no tienes uno, sáltate esta parte; no se pierde nada.
+Si tienes a mano **cualquier asistente de chat gratuito** (el que ya uses), puedes ver cómo clasifica un LLM los mismos 20 mensajes del examen de tu detective. Si no tienes uno, sáltate esta parte: no se pierde nada y el resto del taller no depende de ella.
 
-> **Importante:** estos 20 mensajes son inventados y es seguro pegarlos. **Nunca pegues mensajes reales de otras personas** en un asistente: tienen datos privados (lo hablaremos en el [módulo 08](./08-sesgo-etica-proyecto.md)).
+Como no existe una "clave de respuestas" para lo que dirá tu asistente (depende de cuál uses y del día), **tú serás el juez**. Esta parte trae una rúbrica para que lo evalúes con criterio.
 
-1. En la consola de `index.html`, ejecuta:
+> **Importante:** estos 20 mensajes son inventados y es seguro pegarlos. **Nunca pegues mensajes reales de otras personas** en un asistente: tienen datos privados (lo verás en el [módulo 08](./08-sesgo-etica-proyecto.md)).
+
+### Paso 1 · Obtén la lista
+
+En la consola de `index.html`, ejecuta:
 
 ```js
 console.log(PRUEBA.map((e, i) => (i + 1) + ". " + e.texto).join("\n"))
 ```
 
-2. Copia la lista que aparece. En el asistente, pega este prompt seguido de la lista:
+**Deberías ver:** 20 líneas numeradas, desde `1. Felicidades, has ganado un viaje gratis, reclama tu premio hoy` hasta `20. Hoy ganamos el partido de fútbol, ¡qué alegría!`, y debajo `undefined`.
+
+### Paso 2 · Pregúntale al asistente
+
+Copia la lista que aparece. En el asistente, pega este prompt seguido de la lista:
 
 ```text
 Eres un filtro anti-spam. Para cada mensaje numerado, responde SOLO una línea con el número
@@ -267,55 +326,128 @@ y la palabra SPAM o NORMAL. No expliques nada.
 (aquí pega los 20 mensajes)
 ```
 
-3. Anota en este cuadro lo que respondió. La columna "Etiqueta real" la llenas **después**, mirando `PRUEBA` en `datos.js`:
+### Paso 3 · Anota y cuenta
 
-| # | Asistente | Etiqueta real |
-|---|---|---|
-| 1 a 20 | (anota SPAM o NORMAL) | (la miras en `datos.js`) |
+Copia las 20 respuestas del asistente en este arreglo (reemplaza el ejemplo, que está inventado), uno por mensaje, **en orden**, y ejecútalo. Te dirá cuántos acertó y en cuáles se equivocó:
 
-4. Cuenta sus aciertos (de 20). Guarda este número: en el [módulo 07](./07-evaluacion-honesta.md) lo compararás con el de tu modelo y con el de las reglas.
+```js
+// EJEMPLO inventado: cámbialo por las 20 respuestas de TU asistente, en orden
+const respuestasAsistente = ["SPAM", "SPAM", "SPAM", "SPAM", "SPAM", "NORMAL", "SPAM", "SPAM", "NORMAL", "SPAM",
+                             "NORMAL", "NORMAL", "NORMAL", "NORMAL", "NORMAL", "SPAM", "NORMAL", "NORMAL", "NORMAL", "NORMAL"];
+const fallos = [];
+respuestasAsistente.forEach(function (r, i) {
+  if (r.toLowerCase() !== PRUEBA[i].etiqueta) fallos.push(i + 1);
+});
+({ aciertos: 20 - fallos.length, mensajesFallados: fallos })
+```
 
-> **Actividad 2 · Observa (opcional, 5 min).** Pide al asistente: "¿por qué marcaste el mensaje 6 como lo marcaste?" ¿Su explicación suena convincente? ¿Puedes saber si es la razón **real** o una justificación inventada? Vuelve a ejecutar el mismo prompt: ¿respondió igual? (Los LLM pueden variar entre una ejecución y otra.)
+**Deberías ver** (con el ejemplo inventado): `{aciertos: 17, mensajesFallados: Array(3)}`; despliega la flechita ▸ y verás `[6, 9, 16]` (el ejemplo se equivoca en los mensajes 6, 9 y 16). Con tus respuestas verás tus propios números. **Guarda tu número de aciertos**: en el [módulo 07](./07-evaluacion-honesta.md) lo compararás con el de tu modelo y con el de las reglas.
+
+**Si no te sale…** si ves `Identifier 'respuestasAsistente' has already been declared`, recarga con F5 y pega el bloque otra vez. Si el asistente puso una lista de otro tamaño, el arreglo tiene que tener 20 valores: cuéntalos.
+
+### Rúbrica: cómo juzgar lo que respondió el asistente
+
+Puntúa cada criterio de 0 a 2 (0 = no, 1 = más o menos, 2 = sí). Máximo: 10 puntos.
+
+| # | Criterio | Qué es una buena respuesta | Cómo lo compruebas |
+|---|---|---|---|
+| 1 | **Obedece el formato** | Exactamente 20 líneas, cada una con el número y SPAM o NORMAL, **sin explicaciones** | Cuenta las líneas y busca texto extra. Si añadió comentarios, no siguió la instrucción |
+| 2 | **Acierta en lo fácil** | Marca bien los mensajes claros: los spam con "premio", "bloqueada", "descuento" (1, 2, 4) y los normales cotidianos (11 a 14) | Mira los fallos de `mensajesFallados`: ¿hay alguno entre estos? Sería una falla seria |
+| 3 | **Se equivoca (o duda) solo en lo difícil** | Los difíciles son el 6 (spam educado), el 9 (reunión falsa) y el 16 (mensaje normal con palabras de banco). Fallar solo aquí es razonable | Compara `mensajesFallados` con `[6, 9, 16]` |
+| 4 | **Su nota es creíble** | Para comparar, en este examen las reglas aciertan 16 de 20 y tu modelo 18 de 20 (el módulo 06 lo comprueba). Un asistente muy bueno puede igualar o superar; uno que saque menos de 14 probablemente entendió mal la tarea | Compara tus aciertos con 16 y 18. **Desconfía de un 20/20**: revisa que contaste bien |
+| 5 | **Es estable** | Al repetir el mismo prompt, casi todas las respuestas se mantienen | Repite el prompt una vez y cuenta cuántas cambiaron. Más de 2 o 3 cambios indica poca fiabilidad |
+
+**Si la nota total es 8 a 10:** el asistente es un buen filtro para este tamaño de tarea. **De 5 a 7:** útil con revisión humana. **Menos de 5:** no lo usarías para filtrar spam sin ayuda.
+
+> **Actividad 2 · Observa (opcional, 5 min).** Pide al asistente: "¿por qué marcaste el mensaje 6 como lo marcaste?" Evalúa su explicación con estos criterios antes de abrir la respuesta: (a) ¿menciona **rasgos concretos** del mensaje? (b) ¿es coherente con la etiqueta que dio? (c) ¿puedes saber si es la razón **real** o una justificación inventada después?
+
+<details><summary>Respuesta</summary>
+
+- Una **buena explicación** señala rasgos concretos y verificables (por ejemplo: "ofrece una vacante sin detalles y pide escribir al privado, típico de captación engañosa"), y es **coherente** con la etiqueta: si dijo NORMAL, no debería describir señales de estafa como si la hubiera marcado SPAM.
+- Una **mala explicación** es genérica ("suena sospechoso"), se contradice o cambia de opinión al preguntar otra vez.
+- Sobre si es la razón **real**: en general **no puedes saberlo**. Un LLM genera una explicación que *suena razonable* después de decidir; puede no reflejar cómo llegó al resultado. Esa es una diferencia clave con tu detective, que sí te muestra cada palabra y su peso.
+- Si vuelves a ejecutar el mismo prompt y responde distinto, eso es normal: los LLM pueden variar entre ejecuciones (temperatura).
+
+</details>
 
 ---
 
 ## Parte 7 · Cierre (5 min)
 
-Completa en voz alta: "Un filtro por reglas es ___, un filtro que aprende de ejemplos es ___, un LLM es ___" (una palabra cada uno: *transparente*, *adaptable*, *flexible pero opaco*, por ejemplo).
+### Checkpoints: ¿cumpliste el módulo?
 
----
-
-## Checkpoints
-
-- [ ] `detectarIntencion("Quiero reportar un spam")` → `"reportar"`.
-- [ ] `siguientesPalabras("gana")` → `[["dinero", 3], ["3000", 1]]`.
+- [ ] `detectarIntencion("Quiero reportar un spam")` → `'reportar'`.
+- [ ] `JSON.stringify(siguientesPalabras("gana"))` → `'[["dinero",3],["3000",1]]'`.
 - [ ] Puedes explicar con tus palabras "un LLM predice la siguiente pieza de texto".
 - [ ] Sabes por qué una clave de API no va en el código de la página.
-- [ ] (Opcional) Anotaste los aciertos del asistente sobre los 20 mensajes.
+- [ ] (Opcional) Anotaste los aciertos del asistente sobre los 20 mensajes y los juzgaste con la rúbrica.
 
-## Errores comunes
+### Si no te sale… (errores comunes)
 
 | Síntoma | Causa probable | Solución |
 |---|---|---|
 | `tokenizar is not defined` | Abriste una página que no es `index.html` del taller | Abre `index.html` de esta carpeta (`modelo.js` define `tokenizar`) |
 | `Identifier 'INTENCIONES_BOT' has already been declared` | Pegaste dos veces el bloque | Recarga con **F5** y pega una vez |
 | "El bot no entiende 'hola, que tal'" | Faltan palabras clave | Agrega claves; ese es el reto de un bot por reglas |
-| "El asistente de chat siempre acierta" | Es falso | Revisa sus errores en el cuadro; también se equivoca, a veces con mucha seguridad |
+| "El asistente de chat siempre acierta" | Es falso | Revisa sus errores con la rúbrica; también se equivoca, a veces con mucha seguridad |
 | "El LLM sabe la verdad" | Predice texto probable, no verdadero | Verifica en una fuente confiable |
 
-## Resumen
+### Quiz final (responde primero, despliega después)
 
-- Un chatbot detecta **intenciones** y **entidades**, y responde con reglas, con un LLM o con un híbrido.
-- Los chatbots reales usan ML para reconocer frases parecidas, no solo palabras exactas.
-- Un **LLM** es una red neuronal enorme que **predice la siguiente pieza de texto**; puede alucinar y no sabe de verdad.
-- La IA grande se **alquila** por **API** con una **clave secreta** que nunca se pone en el código público.
-- Tu detective es pequeño, explicable y **privado**: el mensaje no sale de tu navegador.
+**1. ¿Qué diferencia hay entre una intención y una entidad? Da un ejemplo de cada una.**
 
-## Preguntas de cierre
+<details><summary>Respuesta</summary>
 
-1. ¿Qué diferencia hay entre una intención y una entidad? Da un ejemplo de cada una.
-2. ¿Por qué decimos que un LLM "predice" y no que "sabe"?
-3. ¿Qué ventaja tiene que tu detective corra en tu navegador y qué desventaja?
-4. ¿Qué es una alucinación y por qué es peligrosa en un filtro?
+Intención: lo que quiere el usuario ("reportar un spam"). Entidad: un dato dentro del mensaje (un número de teléfono, una fecha).
+
+</details>
+
+**2. ¿Por qué decimos que un LLM "predice" y no que "sabe"?**
+
+<details><summary>Respuesta</summary>
+
+Porque genera el texto más probable según lo que vio al entrenarse; no verifica si es verdad. Por eso puede alucinar.
+
+</details>
+
+**3. ¿Qué ventaja tiene que tu detective corra en tu navegador y qué desventaja?**
+
+<details><summary>Respuesta</summary>
+
+Ventaja: privacidad (el mensaje no sale de tu computador) y velocidad. Desventaja: entiende mucho menos contexto y tono que un LLM.
+
+</details>
+
+**4. ¿Qué es una alucinación y por qué es peligrosa en un filtro?**
+
+<details><summary>Respuesta</summary>
+
+Inventar algo falso con seguridad. En un filtro podría acusar de estafa a un mensaje legítimo (o dar por bueno uno peligroso) con una explicación convincente pero falsa.
+
+</details>
+
+**5. ¿Por qué una clave de API no se escribe en el código de una página web?**
+
+<details><summary>Respuesta</summary>
+
+Porque cualquiera puede verla con F12 y usarla a tu nombre (y a tu costo). Se guarda en un servidor.
+
+</details>
+
+**6. Un bot detecta intenciones con palabras clave. Da una situación en la que se equivoca.**
+
+<details><summary>Respuesta</summary>
+
+Un mensaje con dos intenciones (gana la primera de la lista) o con una negación ("No quiero reportar nada" se entiende como "reportar").
+
+</details>
+
+### Resumen en 5 líneas
+
+1. Un chatbot detecta **intenciones** y **entidades**, y responde con reglas, con un LLM o con un híbrido.
+2. Los chatbots reales usan ML para reconocer frases parecidas, no solo palabras exactas.
+3. Un **LLM** es una red neuronal enorme que **predice la siguiente pieza de texto**; puede alucinar y no sabe de verdad.
+4. La IA grande se **alquila** por **API** con una **clave secreta** que nunca se pone en el código público.
+5. Tu detective es pequeño, explicable y **privado**: el mensaje no sale de tu navegador.
 
 **Siguiente paso:** [Módulo 05 · Naive Bayes: aprender de ejemplos](./05-naive-bayes.md).

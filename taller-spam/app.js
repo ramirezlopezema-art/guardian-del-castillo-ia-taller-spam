@@ -5,6 +5,8 @@
 //   entrenar(datos)                 -> modelo
 //   clasificar(texto, modelo)       -> { etiqueta, probSpam, aportes }
 //   evaluar(modelo, prueba)         -> { exactitud, vp, fp, vn, fn, total, errores }
+// las pruebas automáticas de pruebas.js (botón "Ejecutar autocomprobación"):
+//   ejecutarAutocomprobacion()      -> { version, resultados, resumen, texto }
 // y la API de reglas.js (el filtro escrito a mano, sirve aunque falten TODO):
 //   puntuarPorReglas(texto)         -> { puntaje, etiqueta, coincidencias }
 //   evaluarReglas(prueba)           -> { exactitud, vp, fp, vn, fn, total, errores }
@@ -36,7 +38,7 @@ function mostrarError(error) {
   if (error && error.esPendiente) {
     $("error-titulo").textContent = "Aún falta completar una parte del código";
     $("error-detalle").textContent = error.message;
-    $("error-ayuda").textContent = "Abre modelo.js, completa ese TODO, borra la línea \"pendiente(...)\", guarda y recarga la página (F5).";
+    $("error-ayuda").textContent = "Abre modelo.js, completa ese TODO, borra la línea \"pendiente(...)\", guarda y recarga la página (F5). Para ver qué partes ya funcionan, pulsa \"Ejecutar autocomprobación\".";
   } else {
     $("error-titulo").textContent = "Tu código tiene un problema";
     $("error-detalle").textContent = (error && error.message) ? error.message : String(error);
@@ -417,6 +419,65 @@ function compararExamen() {
   if (desacuerdos === 0) sin.textContent = "Los dos filtros opinan igual en todos los mensajes del examen.";
 }
 
+// ---------- Autocomprobación (las pruebas viven en pruebas.js) ----------
+function autocomprobarEnPagina() {
+  const contenedor = $("autocomp-resultado");
+  contenedor.hidden = false;
+  const lista = $("autocomp-lista");
+  lista.textContent = "";
+
+  if (typeof ejecutarAutocomprobacion !== "function") {
+    $("autocomp-resumen").textContent = "No se pudo cargar pruebas.js.";
+    $("autocomp-version").textContent = "Revisa que exista el archivo pruebas.js y la línea <script src=\"pruebas.js\"> en index.html.";
+    return;
+  }
+
+  let informe;
+  try {
+    informe = ejecutarAutocomprobacion();
+  } catch (error) {
+    $("autocomp-resumen").textContent = "La autocomprobación se detuvo: " + ((error && error.message) ? error.message : String(error));
+    $("autocomp-version").textContent = "Abre la consola (F12) para ver más detalles.";
+    return;
+  }
+
+  $("autocomp-resumen").textContent = resumenAutocomprobacion(informe.resumen);
+  const s = informe.resumen;
+  $("autocomp-version").textContent = "Versión del taller detectada: " + informe.version +
+    " · " + s.ok + " ✅ · " + s.fallo + " ❌ · " + s.pendiente + " ⏳ · " + s.omitido + " ⚪";
+
+  for (const r of informe.resultados) {
+    const li = document.createElement("li");
+    li.className = "ac-" + r.estado;
+
+    const estado = document.createElement("span");
+    estado.className = "ac-estado";
+    estado.textContent = AUTOCOMP_ICONO[r.estado] + " " + AUTOCOMP_PALABRA[r.estado];
+    li.appendChild(estado);
+
+    const parte = document.createElement("span");
+    parte.className = "ac-parte";
+    parte.textContent = r.parte;
+    li.appendChild(parte);
+
+    li.appendChild(document.createTextNode(r.nombre));
+
+    if (r.estado !== "ok") {
+      const detalle = document.createElement("span");
+      detalle.className = "ac-detalle";
+      detalle.textContent = r.detalle;
+      li.appendChild(detalle);
+      if (r.pista) {
+        const pista = document.createElement("span");
+        pista.className = "ac-pista";
+        pista.textContent = "Pista: " + r.pista;
+        li.appendChild(pista);
+      }
+    }
+    lista.appendChild(li);
+  }
+}
+
 // ---------- Ejemplos rápidos ----------
 const EJEMPLOS_RAPIDOS = [
   "Ganaste un premio gratis, haz clic en el enlace",
@@ -460,6 +521,7 @@ function iniciar() {
   });
   $("btn-examen").addEventListener("click", tomarExamen);
   $("btn-comparar").addEventListener("click", compararExamen);
+  $("btn-autocomprobar").addEventListener("click", autocomprobarEnPagina);
   $("texto").addEventListener("keydown", function (e) {
     if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) analizar();
   });

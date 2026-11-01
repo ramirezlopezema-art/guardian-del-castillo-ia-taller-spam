@@ -1,14 +1,36 @@
 # Módulo 02 · Redes neuronales y cómo aprende una máquina
 
-> **Curso:** Detective de mensajes ([índice del taller largo](../TALLER_LARGO.md)) · **Duración:** 70 min · **Anterior:** [Módulo 01](./01-que-es-la-ia.md) · **Siguiente:** [Módulo 03](./03-texto-y-reglas.md) · **Glosario:** [00-glosario.md](./00-glosario.md)
+> **Tiempo de estudio:** 70 min · **Anterior:** [Módulo 01](./01-que-es-la-ia.md) · **Siguiente:** [Módulo 03](./03-texto-y-reglas.md) · **Glosario:** [00-glosario.md](./00-glosario.md) · **Ayuda y consola:** [TALLER_LARGO.md](../TALLER_LARGO.md#cómo-estudiar-esto-solo)
 
-## Antes de empezar
+**Meta de este módulo:** entender cómo decide una neurona artificial, programar una en la consola del navegador y **verla aprender** sus propios pesos.
 
-**Recuerda del módulo anterior:** la IA con aprendizaje (Machine Learning) recibe **datos + respuestas** y produce **reglas** (el modelo). El Deep Learning es ML con *redes neuronales*.
+## Antes de empezar: ¿estás listo?
 
-Si empiezas aquí sin haber visto el módulo 01, solo necesitas esta idea: *una máquina puede aprender sus reglas a partir de ejemplos que ya traen su respuesta*.
+Si vienes del módulo 01, esto será un repaso rápido. Si llegas directo aquí, basta con que sepas esta idea: *una máquina puede aprender sus reglas a partir de ejemplos que ya traen su respuesta*.
 
-Aquí abrirás por primera vez la **consola del navegador**. Es una ventana donde escribes JavaScript y ves el resultado al instante. Se abre con **F12** y la pestaña **Consola** (en la página `index.html` del taller sirve perfecto).
+**1. En Machine Learning, ¿qué le das a la máquina y qué obtienes?**
+
+<details><summary>Respuesta</summary>
+
+Le das **datos + respuestas** (ejemplos con su etiqueta) y obtienes las **reglas**: el *modelo*.
+
+</details>
+
+**2. ¿Qué es una etiqueta?**
+
+<details><summary>Respuesta</summary>
+
+La respuesta correcta de un ejemplo, puesta por una persona. En el taller: `"spam"` o `"normal"`.
+
+</details>
+
+**3. ¿Cómo abres la consola del navegador?**
+
+<details><summary>Respuesta</summary>
+
+Abres `index.html`, pulsas **F12** y haces clic en la pestaña **Consola**. Pasos detallados: [Cómo abrir la consola](../TALLER_LARGO.md#4-cómo-abrir-la-consola-del-navegador-f12). **Léelos ahora si es tu primera vez**: este módulo usa mucho la consola.
+
+</details>
 
 ## Objetivos
 
@@ -18,7 +40,7 @@ Aquí abrirás por primera vez la **consola del navegador**. Es una ventana dond
 - [ ] Explicar qué es una red de muchas neuronas y qué significa "profundo".
 - [ ] Explicar por qué el **dato** es el combustible y por qué se separa entrenamiento y prueba.
 
-## Mapa de tiempos
+## Mapa de tiempos (estudio estimado)
 
 | Parte | Tema | Minutos |
 |---|---|---|
@@ -29,7 +51,7 @@ Aquí abrirás por primera vez la **consola del navegador**. Es una ventana dond
 | 5 | Muchas neuronas: una red | 10 |
 | 6 | Entrenar: aprender los pesos | 10 |
 | 7 | Los datos: el combustible | 5 |
-| 8 | Cierre | 5 |
+| 8 | Cierre: quiz y resumen | 5 |
 | | **Total** | **70** |
 
 ---
@@ -57,10 +79,22 @@ Una neurona recibe **números**, multiplica cada uno por un **peso** (qué tan i
 
 Los **pesos** son lo que la neurona "sabe". Cambiar los pesos es cambiar lo que sabe.
 
-> **Actividad 1 · A mano (5 min, en parejas).** Con los pesos `+3, -2, -1`, calculen la suma y la decisión para:
+> **Actividad 1 · A mano (5 min, con lápiz y papel).** Con los pesos `+3, -2, -1`, calcula la suma y la decisión para:
 > - (a) van amigos, hay tarea, **sí** llueve → `1, 1, 1`
 > - (b) **no** van amigos, **no** hay tarea, llueve → `0, 0, 1`
 > - (c) van amigos, no hay tarea, no llueve → `1, 0, 0`
+>
+> Recuerda: la neurona dice "sí" solo si la suma es **mayor que 0** (0 no cuenta).
+
+<details><summary>Respuesta</summary>
+
+- (a) 3 − 2 − 1 = **0**. No es mayor que 0: **no**.
+- (b) 0 + 0 − 1 = **−1**: **no**.
+- (c) 3 + 0 + 0 = **3**: **sí**.
+
+Luego lo comprobarás en la consola: debería darte `no`, `no`, `sí`. Si en (a) respondiste "sí", repasa: "mayor que 0" no incluye al 0.
+
+</details>
 
 ---
 
@@ -79,6 +113,8 @@ function neurona(entradas, pesos, sesgo) {
 const pesosCine = [3, -2, -1];   // amigos, tarea, lluvia
 ```
 
+**Deberías ver:** `undefined` (así responde la consola cuando solo declaras cosas). No hay error en rojo.
+
 4. Ahora pega estas líneas, **una por una**, y compara con el resultado:
 
 ```js
@@ -87,7 +123,13 @@ neurona([0, 1, 1], pesosCine, 0)   // "no": no van amigos, hay tarea y llueve
 neurona([1, 1, 1], pesosCine, 0)   // "no": la suma da 0, y no es mayor que 0
 ```
 
-**Checkpoint · deberías ver:** `"sí"`, `"no"`, `"no"`.
+**Deberías ver, en este orden:** `'sí'`, `'no'`, `'no'` (la consola los muestra con comillas simples).
+
+**Si no te sale…**
+
+- `neurona is not defined`: recargaste la página o pegaste el bloque en otra pestaña. Vuelve a pegar el primer bloque.
+- `Identifier 'pesosCine' has already been declared`: pegaste el primer bloque dos veces. Recarga con **F5** y pégalo una vez.
+- `Invalid or unexpected token`: las comillas se volvieron "curvas" al copiar. Escribe tú las comillas con el teclado.
 
 ### ¿Qué es el tercer parámetro, el `sesgo`?
 
@@ -97,12 +139,26 @@ Es un número fijo que se suma antes de decidir. Mueve el "punto de corte". Con 
 neurona([1, 1, 1], pesosCine, 1)   // "sí": el sesgo inclina un poco la balanza
 ```
 
+**Deberías ver:** `'sí'`.
+
 > **Ojo con el nombre:** este "sesgo" (en inglés *bias*) es un número dentro de la neurona. **No** es lo mismo que el *sesgo injusto* de un sistema que discrimina; de ese hablaremos en el [módulo 08](./08-sesgo-etica-proyecto.md).
 
-> **Actividad 2 · Cambia lo que sabe (6 min).** Cambia los pesos de `pesosCine` (en la consola: escribe una nueva lista, por ejemplo `const pesosCine2 = [1, -5, 0]`, y úsala en `neurona(...)`). Responde:
-> 1. ¿Con qué pesos la neurona nunca va al cine si hay tarea?
-> 2. ¿Con qué pesos va al cine aunque llueva?
+> **Actividad 2 · Cambia lo que sabe (6 min).** En la consola escribe una nueva lista de pesos, por ejemplo `const pesosCine2 = [1, -5, 0]`, y úsala en `neurona(...)`. Antes de abrir la respuesta, intenta contestar:
+> 1. ¿Con qué pesos la neurona **nunca** va al cine si hay tarea?
+> 2. ¿Con qué pesos va al cine **aunque llueva**?
 > 3. ¿Qué pasó con lo que "sabe" la neurona cuando cambiaste los pesos?
+
+<details><summary>Respuesta</summary>
+
+Con `pesosCine2 = [1, -5, 0]` y sesgo 0:
+
+1. El peso de la tarea es **−5**, mucho más grande (en valor) que el +1 de los amigos: `neurona([1, 1, 0], pesosCine2, 0)` da `'no'` (1 − 5 = −4). Con un peso negativo muy grande, "hay tarea" gana siempre.
+2. El peso de la lluvia es **0**: no empuja ni a favor ni en contra. `neurona([1, 0, 1], pesosCine2, 0)` da `'sí'` (1 + 0 + 0 = 1), llueva o no.
+3. Cambió lo que sabe: **antes** pesaba mucho a los amigos y poco a la lluvia; **ahora** la tarea manda. Mismas entradas, otra decisión. Los pesos son la memoria de la neurona.
+
+Tus números pueden ser otros: lo importante es que el peso de la tarea sea claramente negativo y mayor en valor absoluto que los positivos.
+
+</details>
 
 ---
 
@@ -113,16 +169,35 @@ Usemos la misma neurona para algo del taller. Las entradas serán **tres pistas*
 ```js
 // entradas: [dice "gratis", trae un enlace, lo manda un amigo]
 const pesosSpam = [2, 2, -3];
+```
+
+Pega esa línea (verás `undefined`) y luego ejecuta estas tres **una por una**:
+
+```js
 neurona([1, 1, 0], pesosSpam, -1)   // "sí" es spam: gratis + enlace de un desconocido
 neurona([0, 1, 1], pesosSpam, -1)   // "no": trae enlace, pero lo manda un amigo
 neurona([0, 0, 0], pesosSpam, -1)   // "no": no pasa nada raro
 ```
 
-**Checkpoint · deberías ver:** `"sí"`, `"no"`, `"no"`.
+**Deberías ver:** `'sí'`, `'no'`, `'no'`. (La primera suma da 2 + 2 + 0 − 1 = 3.)
 
 Fíjate: el peso de "lo manda un amigo" es **negativo** (`-3`). Empuja hacia "no es spam". Es la misma idea que usará tu detective más adelante: cada palabra empuja hacia un lado.
 
-> **Actividad 3 · Diseña tu neurona (7 min, en parejas).** Inventen una cuarta pista (por ejemplo, "tiene muchos signos de exclamación") y decidan su peso. Escriban **dos mensajes** y la lista de entradas de cada uno: uno que su neurona marque como spam y uno que no. Pruébenlos en la consola.
+> **Actividad 3 · Diseña tu neurona (7 min).** Inventa una cuarta pista (por ejemplo, "tiene muchos signos de exclamación") y decide su peso. Escribe **dos mensajes** y la lista de entradas de cada uno (4 números): uno que tu neurona marque como spam y uno que no. Pruébalos en la consola con tus nuevos pesos.
+
+<details><summary>Respuesta</summary>
+
+No hay una única solución. Un ejemplo que funciona:
+
+```js
+const pesosSpam4 = [2, 2, -3, 1];   // gratis, enlace, amigo, muchos signos de exclamación
+neurona([1, 0, 0, 1], pesosSpam4, -1)   // "sí": gratis + exclamaciones (2 + 1 - 1 = 2)
+neurona([0, 0, 1, 0], pesosSpam4, -1)   // "no": lo manda un amigo (-3 - 1 = -4)
+```
+
+**Rúbrica para revisar tu respuesta:** (1) tu lista de entradas tiene 4 números, todos 0 o 1; (2) el mensaje "spam" suma más que 0 y el otro no; (3) el peso nuevo tiene sentido (una pista de spam, positivo; una pista de mensaje confiable, negativo).
+
+</details>
 
 ---
 
@@ -155,6 +230,8 @@ Una neurona sola es muy limitada. Si conectas muchas, en capas, obtienes una **r
 ### ¿Tu detective usa una red neuronal?
 
 No. Tu detective usará **Naive Bayes**, que es más simple: no tiene capas ni neuronas, solo **cuenta palabras**. Pero resuelve el mismo problema (clasificar) y la idea de fondo es idéntica: **cada palabra empuja la decisión hacia un lado con un peso, y esos pesos se obtienen de los datos**.
+
+**Comprueba que lo entendiste (1 min):** en una frase, ¿qué significa "profundo" en Deep Learning? (Respuesta: que la red tiene muchas capas ocultas.)
 
 ---
 
@@ -212,18 +289,41 @@ function entrenarNeurona(ejemplos, rondas) {
 entrenarNeurona(ejemplosNeurona, 10)
 ```
 
-**Checkpoint · deberías ver:**
+**Deberías ver:**
 
 ```
 ronda 1: errores = 2, pesos = [1,1,-1], sesgo = 0
 ronda 2: errores = 0, pesos = [1,1,-1], sesgo = 0
 ```
 
-Y al final el objeto `{pesos: [1, 1, -1], sesgo: 0}`.
+Y al final el objeto `{pesos: Array(3), sesgo: 0}`. Haz clic en la flechita ▸ y luego en `pesos` para ver `[1, 1, -1]`.
+
+**Si no te sale…**
+
+- `ejemplosNeurona is not defined` o `entrenarNeurona is not defined`: pega **todo** el bloque de una vez, completo (de la primera a la última línea).
+- Si ves otros números de errores, revisa que copiaste exactamente los 7 ejemplos (cada `respuesta` es 1 o 0 como arriba).
+- Si pegaste este bloque dos veces, sale `Identifier ... has already been declared`: recarga con F5 y pégalo una vez.
 
 Lee lo que pasó: empezó sin saber nada, se equivocó en 2 ejemplos, **ajustó sus pesos** y en la segunda ronda ya acertó los 7. Descubrió sola que "gratis" y "enlace" empujan hacia spam y que "lo manda un amigo" empuja hacia normal. **Eso es aprender.**
 
-> **Actividad 4 · Rompe el aprendizaje (5 min).** Agrega a `ejemplosNeurona` un octavo ejemplo **contradictorio**: `{ entradas: [1, 0, 1], respuesta: 1 }` (las mismas pistas que el sexto ejemplo, pero con la respuesta contraria). Vuelve a ejecutar `entrenarNeurona(ejemplosNeurona, 10)`. ¿Llega a 0 errores? ¿Qué te dice eso sobre dos personas que etiquetan igual de mal un mensaje parecido? (Pista: usa `ejemplosNeurona.push(...)` y vuelve a llamar la función.)
+> **Actividad 4 · Rompe el aprendizaje (5 min).** Agrega a `ejemplosNeurona` un octavo ejemplo **contradictorio**: `{ entradas: [1, 0, 1], respuesta: 1 }` (las mismas pistas que el sexto ejemplo, pero con la respuesta contraria). En la consola escribe:
+>
+> ```js
+> ejemplosNeurona.push({ entradas: [1, 0, 1], respuesta: 1 });
+> entrenarNeurona(ejemplosNeurona, 10)
+> ```
+>
+> Antes de leer la respuesta, mira la salida: ¿llega a 0 errores? ¿Qué te dice eso sobre dos personas que etiquetan igual de mal un mensaje parecido?
+
+<details><summary>Respuesta</summary>
+
+**Deberías ver** (las primeras líneas): `ronda 1: errores = 3, pesos = [2,1,0], sesgo = 1`, `ronda 2: errores = 3, ...` y, desde la ronda 3, `errores = 2` en cada ronda hasta la 10, con pesos `[2,1,-1]` y sesgo 0. **Nunca llega a 0 errores.**
+
+Por qué: dos ejemplos tienen **las mismas entradas pero respuestas contrarias**; ninguna combinación de pesos puede acertar los dos. Es lo que pasa cuando dos personas etiquetan de forma contradictoria mensajes parecidos: **el ruido en las etiquetas limita al modelo**. Un modelo no puede ser más consistente que sus datos.
+
+(Para volver al caso normal, recarga con F5 y pega otra vez el bloque.)
+
+</details>
 
 ---
 
@@ -238,48 +338,79 @@ Lee lo que pasó: empezó sin saber nada, se equivocó en 2 ejemplos, **ajustó 
 
 > **Regla de oro:** *basura entra, basura sale.* Si los datos tienen errores o prejuicios, el modelo los aprende. Un buen modelo con malos datos es un mal modelo.
 
-Echa un vistazo a `datos.js` en VS Code. Lee 5 mensajes de cada lista. Fíjate en que cada uno tiene `texto` y `etiqueta`. **Esa etiqueta la puso una persona.**
+**Tarea de lectura (2 min):** echa un vistazo a `datos.js` en VS Code. Lee 5 mensajes de cada lista. Fíjate en que cada uno tiene `texto` y `etiqueta`. **Esa etiqueta la puso una persona.** ¿Alguno te parece difícil de etiquetar?
 
-> **Si tienes internet y te sobra tiempo (opcional, fuera del horario):** entra a *Teachable Machine* de Google, entrena un modelo de imágenes con tu cámara ("mano abierta" contra "puño") y mira qué pasa si le quitas la mitad de los ejemplos. Es la misma idea con una red neuronal de verdad.
+> **Si tienes internet y te sobra tiempo (opcional, fuera del tiempo del módulo):** entra a *Teachable Machine* de Google, entrena un modelo de imágenes con tu cámara ("mano abierta" contra "puño") y mira qué pasa si le quitas la mitad de los ejemplos. Es la misma idea con una red neuronal de verdad.
 
 ---
 
 ## Parte 8 · Cierre (5 min)
 
-Revisa el resumen y responde las preguntas de cierre en voz alta con tu pareja.
+### Checkpoints: ¿cumpliste el módulo?
 
----
-
-## Checkpoints
-
-- [ ] La consola devuelve `"sí"`, `"no"`, `"no"` con `pesosCine`.
-- [ ] Con `pesosSpam`, devuelve `"sí"`, `"no"`, `"no"`.
+- [ ] La consola devuelve `'sí'`, `'no'`, `'no'` con `pesosCine`.
+- [ ] Con `pesosSpam`, devuelve `'sí'`, `'no'`, `'no'`.
 - [ ] `entrenarNeurona(...)` imprime 2 rondas y termina con pesos `[1,1,-1]`.
 - [ ] Puedes explicar la diferencia entre datos de entrenamiento y de prueba.
 
-## Errores comunes
+### Si no te sale… (errores comunes)
 
 | Síntoma | Causa probable | Solución |
 |---|---|---|
 | `Identifier 'pesosCine' has already been declared` | Pegaste dos veces un `const` | Recarga la página (**F5**) o cambia el nombre de la variable |
 | `neurona is not defined` | Reiniciaste la página y se perdió la función | Pega otra vez el bloque de la Parte 2 |
-| La neurona siempre responde `"no"` | Todos los pesos son pequeños o el sesgo es muy negativo | Sube un peso o el sesgo y prueba |
+| La neurona siempre responde `'no'` | Todos los pesos son pequeños o el sesgo es muy negativo | Sube un peso o el sesgo y prueba |
 | `NaN` en las sumas | Te faltan entradas o pesos (listas de distinto tamaño) | Revisa que `entradas` y `pesos` tengan el mismo largo |
 | "Entonces el cerebro es una suma de números" | Es solo una **analogía** | Las neuronas reales son mucho más complejas; las artificiales solo se inspiran en ellas |
 
-## Resumen
+### Quiz final (responde primero, despliega después)
 
-- Una **neurona** multiplica entradas por pesos, suma y decide.
-- Los **pesos** son lo que sabe; cambiarlos cambia las decisiones.
-- Una **red** son muchas neuronas en capas; **profundo** = muchas capas.
-- **Entrenar** = ajustar los pesos cuando hay error, una y otra vez.
-- Los **datos** son el combustible; se separan en entrenamiento y prueba para saber si de verdad aprendió.
+**1. ¿Qué significa que un peso sea negativo?**
 
-## Preguntas de cierre
+<details><summary>Respuesta</summary>
 
-1. ¿Qué significa que un peso sea negativo?
-2. ¿Qué pasó con los pesos cuando la neurona se equivocó durante el entrenamiento?
-3. ¿Por qué no probamos al modelo con los mismos ejemplos con los que aprendió?
-4. ¿Qué pasa si alguien etiqueta mal varios ejemplos?
+Que esa entrada **empuja hacia el "no"**: cuando está presente, resta a la suma.
+
+</details>
+
+**2. ¿Qué pasó con los pesos cuando la neurona se equivocó durante el entrenamiento?**
+
+<details><summary>Respuesta</summary>
+
+Se ajustaron un paso en la dirección que corrige el error (hacia arriba si debía decir sí y dijo no; hacia abajo en el caso contrario), solo para las entradas que estaban presentes.
+
+</details>
+
+**3. ¿Por qué no probamos al modelo con los mismos ejemplos con los que aprendió?**
+
+<details><summary>Respuesta</summary>
+
+Porque así solo comprobamos que memorizó. Para saber si **aprendió** hay que probar con datos que nunca vio.
+
+</details>
+
+**4. ¿Qué pasa si alguien etiqueta mal varios ejemplos?**
+
+<details><summary>Respuesta</summary>
+
+El modelo aprende el error o no logra acertar todo (como en la Actividad 4). "Basura entra, basura sale".
+
+</details>
+
+**5. ¿Qué diferencia hay entre una neurona y una red neuronal?**
+
+<details><summary>Respuesta</summary>
+
+Una neurona suma entradas por pesos y decide. Una red conecta muchas neuronas en capas; con muchas capas ocultas se llama *profunda* (Deep Learning).
+
+</details>
+
+### Resumen en 5 líneas
+
+1. Una **neurona** multiplica entradas por pesos, suma y decide (si la suma es mayor que 0, dice "sí").
+2. Los **pesos** son lo que sabe; cambiarlos cambia las decisiones.
+3. Una **red** son muchas neuronas en capas; **profundo** = muchas capas.
+4. **Entrenar** = ajustar los pesos cuando hay error, una y otra vez, hasta que acierte.
+5. Los **datos** son el combustible y se separan en entrenamiento y prueba para saber si de verdad aprendió.
 
 **Siguiente paso:** [Módulo 03 · Texto para máquinas y filtro por reglas](./03-texto-y-reglas.md).

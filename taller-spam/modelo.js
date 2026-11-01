@@ -6,8 +6,15 @@
 //   - Trabaja SOLO en este archivo (modelo.js).
 //   - Cada TODO termina con una línea "pendiente(...)" que avisa a la página
 //     que aún no lo hiciste. Cuando termines tu código, BORRA esa línea.
-//   - Después de cada TODO, guarda el archivo y recarga index.html (F5).
+//   - Después de cada TODO, guarda el archivo (Ctrl+S) y recarga index.html (F5).
+//   - Para saber si tu código está bien, pulsa "Ejecutar autocomprobación" en
+//     la página (o escribe autocomprobar() en la consola, F12).
+//   - Haz una COPIA de este archivo antes de empezar (modelo.original.js):
+//     así siempre puedes volver al punto de partida.
 // =====================================================================
+
+// Para la autocomprobación: esta es la versión larga (4 TODO). No lo cambies.
+const VERSION_TALLER = "larga";
 
 // ---------------------------------------------------------------------
 // Utilidades (ya listas, no las cambies)

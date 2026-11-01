@@ -2,7 +2,15 @@
 // SOLUCIÓN DE REFERENCIA (versión larga) - Filtro anti-spam Naive Bayes
 // Reemplaza a modelo.js: copia este archivo encima de ../modelo.js
 // (no lo mires antes de intentarlo tú. ¡El aprendizaje está en intentarlo!)
+//
+// Cómo usarlo (solo después de intentarlo):
+//   1. Guarda una copia de tu modelo.js (por ejemplo, modelo.mio.js).
+//   2. Copia este archivo encima de modelo.js y recarga la página (F5).
+//   3. Pulsa "Ejecutar autocomprobación": todo debe salir en ✅.
 // =====================================================================
+
+// Para la autocomprobación: versión larga (4 TODO).
+const VERSION_TALLER = "larga";
 
 // ---------------------------------------------------------------------
 // Utilidades (ya listas)

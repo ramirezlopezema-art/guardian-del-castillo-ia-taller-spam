@@ -17,7 +17,14 @@ Short version now 2 h, long version 8 h, both self-contained for students who mi
 - [ ] T5 Rewrite TALLER_CORTO.md (120 min) and TALLER_LARGO.md as index + largo/ modules (480 min), richer explanations
 - [ ] T6 Verify code, recompute quoted numbers, cross-references
 
+## Scope change 2 (accepted by user): self-study
+No instructor will teach these workshops; they must be fully self-explanatory. 
+- [ ] T7 Remove teacher dependence from all docs (groups/class/teacher notes), self-study pacing, answers in collapsible blocks, troubleshooting FAQ, closing checklist
+- [ ] T8 Add in-page self-check (pruebas.js + panel) with per-TODO pass/fail and hints
+- [ ] T9 Verify
+
 ## Evidence
+T7-T9 done by writer (uncommitted): self-study rewrite, pruebas.js with 18 self-checks (solution 18 ok, starter 2 ok/16 pending, broken variants flagged), solution 0.90 / rules 0.80 unchanged, 179 links resolve, 480/120 min totals, not tested in a real browser. Parent spot check: node --check on all .js.
 T4-T6 done by writer (uncommitted): rules filter 0.80 vs learned 0.90 on PRUEBA, 8 modules sum 480 min, short sums 120, 0 broken links, snippets run under node, not tested in a real browser. Parent spot check: node --check on all .js.
 Earlier T1-T3 done by writer: solution accuracy 0.90 on 20 held-out (vp9 fn1 fp1 vn9), 0 overlap, node --check ok on all .js, DOM ids cross-checked with a simulated DOM. Not tested in a real browser. Parent spot check: node --check re-run. No commit made.
 

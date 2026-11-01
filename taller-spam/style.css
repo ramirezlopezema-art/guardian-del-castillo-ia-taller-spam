@@ -159,6 +159,25 @@ textarea {
 }
 .desacuerdo-quien { font-size: 0.85rem; color: var(--suave); display: block; }
 
+/* Autocomprobación */
+.autocomp-lista { list-style: none; padding: 0; margin: 8px 0 0; }
+.autocomp-lista li {
+  border: 1px solid var(--borde);
+  border-left-width: 6px;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  background: #fff;
+}
+.ac-ok { border-left-color: var(--normal); background: #f7fdf9; }
+.ac-fallo { border-left-color: var(--spam); background: #fff7f7; }
+.ac-pendiente { border-left-color: #f59e0b; background: #fffbeb; }
+.ac-omitido { border-left-color: var(--suave); }
+.ac-estado { font-weight: 700; margin-right: 6px; }
+.ac-parte { color: var(--suave); font-size: 0.85rem; margin-right: 6px; }
+.ac-detalle, .ac-pista { display: block; font-size: 0.9rem; margin-top: 4px; }
+.ac-pista { color: #92400e; }
+
 /* Error amable */
 .caja-error {
   background: #fef3c7;

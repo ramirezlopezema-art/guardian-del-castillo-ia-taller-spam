@@ -6,7 +6,14 @@
 // Cómo usarlo: copia este archivo encima de ../modelo.js
 // (o cambia en index.html "modelo.js" por "soluciones/modelo.corto.js").
 // Cuando termines tu código, BORRA la línea "pendiente(...)" y recarga (F5).
+// Para comprobarlo, pulsa "Ejecutar autocomprobación" en la página.
+//
+// IMPORTANTE: antes de copiar este archivo sobre modelo.js, guarda una copia
+// de tu modelo.js actual como modelo.original.js (la guía corta explica cómo).
 // =====================================================================
+
+// Para la autocomprobación: esta es la versión corta (solo falta clasificar).
+const VERSION_TALLER = "corta";
 
 // ---------------------------------------------------------------------
 // Utilidades (ya listas)
