@@ -1,5 +1,7 @@
 # Detective de mensajes: entrena tu propio filtro anti-spam
 
+**Trabajo de Emanuel Ramirez Lopez**
+
 Taller de Introducción a la IA, **autocontenido** y pensado para **estudiar solo, en casa** (no hace falta haber hecho otro proyecto ni tener un profesor al lado).
 Parte de qué es la IA y llega a programar un clasificador **Naive Bayes** en JavaScript puro:
 compara un filtro de reglas con uno que aprende, lo mide con un examen y lo rompe con datos sesgados.
